@@ -1,0 +1,60 @@
+import os
+import pandas as pd
+import numpy as np
+
+# Paths
+metadata_path = 'C:/Users/silvi/Downloads/widsdatathon2025-university/metadata/training_metadata.csv'
+matrix_folder = 'C:/Users/silvi/Downloads/widsdatathon2025-university/train_tsv/train_tsv'
+
+# Load metadata
+metadata_df = pd.read_csv(metadata_path)
+
+
+# Function to find the file corresponding to a specific patient ID
+def find_matrix_file(patient_id, folder_path):
+    for filename in os.listdir(folder_path):
+        if f"sub-{patient_id}" in filename:
+            return os.path.join(folder_path, filename)
+    return None
+
+
+# Function to load and process each patient's connectivity matrix
+def process_connectivity_matrix(file_path):
+    # Load the matrix (assuming it's saved as a TSV file)
+    matrix = np.loadtxt(file_path, delimiter='\t')
+
+    # Extract the upper triangular portion (excluding the diagonal)
+    upper_triangular_values = matrix[np.triu_indices_from(matrix, k=1)]
+
+    return upper_triangular_values
+
+
+# List to store processed data
+processed_data = []
+
+# Loop over each patient in the metadata
+for _, row in metadata_df.iterrows():
+    participant_id = row['participant_id']
+
+    # Find the file containing the patient's connectivity matrix
+    file_path = find_matrix_file(participant_id, matrix_folder)
+
+    if file_path is None:
+        print(f"File not found for patient {participant_id}")
+        continue
+
+    # Process the connectivity matrix for this patient
+    connectivity_vector = process_connectivity_matrix(file_path)
+
+    # Combine metadata and connectivity vector for this patient
+    combined_row = row.to_dict()  # Convert metadata row to dictionary
+    combined_row['connectivity_vector'] = connectivity_vector.tolist()  # Store vector as a single column
+    processed_data.append(combined_row)
+
+# Create a DataFrame with the processed data
+final_df = pd.DataFrame(processed_data)
+
+# Save the merged DataFrame to a CSV file for future use
+final_df.to_csv('merged_data2.csv', index=False)
+
+print("Data processing complete. Merged data saved to 'merged_data.csv'")
