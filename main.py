@@ -23,8 +23,8 @@ target = 'age'  # Define target column for potential later use
 
 # Encoding specific categorical columns to numerical values (excluding 'ethnicity')
 encoding_maps = {
-    'sex': {'Male': 0, 'Female': 1},  # Example mapping; adjust if necessary
-    'race': {'White': 0, 'Black': 1, 'Asian': 2, 'Other': 3}  # Adjust according to data
+    'sex': {'Male': 0, 'Female': 1}, 
+    'race': {'White': 0, 'Black': 1, 'Asian': 2, 'Other': 3}  
 }
 
 print("Encoding categorical columns (sex, race)...")
@@ -42,7 +42,6 @@ def find_matrix_file(patient_id, folder_path):
 
 # Function to load and process each patient's connectivity matrix
 def process_connectivity_matrix(file_path):
-    # Load the matrix (assuming it's saved as a TSV file)
     matrix = np.loadtxt(file_path, delimiter='\t')
 
     # Extract the upper triangular portion (excluding the diagonal)
@@ -97,8 +96,8 @@ print("Standardization complete.")
 
 # Preserve participant_id and drop all remaining non-numeric columns
 print("Removing non-numeric columns...")
-participant_id = final_df['participant_id']  # Preserve the participant_id column
-final_df = final_df.select_dtypes(include=[np.number])  # Keep only numeric columns
+participant_id = final_df['participant_id'] 
+final_df = final_df.select_dtypes(include=[np.number]) 
 final_df['participant_id'] = participant_id  # Add participant_id back
 print("Non-numeric columns removed. Final data is numerical only, including participant_id.")
 
